@@ -12,17 +12,29 @@ int main(void)
 {
 	videoSetMode(MODE_5_2D);
 	videoSetModeSub(MODE_5_2D);
+	// vramSetBankB(VRAM_B_MAIN_BG);
+  	// vramSetBankC(VRAM_C_SUB_BG);
     // vramSetBankA(VRAM_A_MAIN_BG_0x06000000);
 
-	int hudsonBg = bgInit(2, BgType_Bmp8, BgSize_B8_512x256, 0,0);
+	// enable extended palettes
+	bgExtPaletteEnable();
+	bgExtPaletteEnableSub();
+
+	int hudsonBg = bgInit(3, BgType_Bmp8, BgSize_B8_512x256, 0,0);
 	bgSetControlBits(hudsonBg, BG_WRAP_ON); // scrolling background
-	// int piracyBg = bgInit(3, BgType_Bmp8, BgSize_B8_256x256, 0, 0);
+	int piracyBg = bgInit(0, BgType_Text8bpp, BgSize_T_256x256, 1, 1);
 	int jailBg = bgInitSub(2, BgType_Bmp8, BgSize_B8_256x256, 0, 0);
 
 	dmaCopy(hudsonBitmap, bgGetGfxPtr(hudsonBg), 512*256);
 	dmaCopy(hudsonPal, BG_PALETTE, 256*2);
-	// dmaCopy(nopartyBitmap, bgGetGfxPtr(piracyBg), 256*256);
-	// dmaCopy(nopartyPal, bgGetPalPtr(piracyBg), 256*2);
+	dmaCopy(nopartyTiles, bgGetGfxPtr(piracyBg), nopartyTilesLen);
+	dmaCopy(nopartyMap, bgGetMapPtr(piracyBg), nopartyMapLen);
+	// you can only access extended palettes in LCD mode
+  	vramSetBankE(VRAM_E_LCD); // for main engine
+	dmaCopy(nopartyPal,  &VRAM_E_EXT_PALETTE[0][0], nopartyPalLen);  // bg 0, slot 0
+	// map vram banks to extended palettes
+	// http://mtheall.com/banks.html#A=MBG0&C=MBG2&E=BGEPAL&H=SBGEPAL
+	vramSetBankE(VRAM_E_BG_EXT_PALETTE);     // for main engine
 	dmaCopy(jailBitmap, bgGetGfxPtr(jailBg), 256*256);
 	dmaCopy(jailPal, BG_PALETTE_SUB, 256*2);
 
