@@ -1,6 +1,10 @@
 #include <nds.h>
 #include <stdio.h>
 #include <gl2d.h>
+#include <maxmod9.h>
+
+#include "soundbank.h"  // Soundbank definitions
+#include "soundbank_bin.h"  // Soundbank binary file
 
 // grit adds a nice header we can include to access the data
 // this has the same name as the image
@@ -45,6 +49,12 @@ int main(void)
 	vramSetBankE(VRAM_E_BG_EXT_PALETTE);     // for main engine
   	vramSetBankH(VRAM_H_SUB_BG_EXT_PALETTE); // for sub engine
 
+	// Use this if you have the soundbank loaded into memory
+    mmInitDefaultMem( (mm_addr)soundbank_bin );
+	// load sound effects
+	mmLoadEffect( SFX_NOPARTY );
+	// play sound effect
+	mmEffect(SFX_NOPARTY);
 
 	int x = 0;
 	int flipflop = 0; // flopflop slows scrolling by 2x
