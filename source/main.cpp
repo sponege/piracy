@@ -60,16 +60,21 @@ int main(void)
 	int flipflop = 0; // flopflop slows scrolling by 2x
 	int frames = 0;
 	#define period 39
+	int kicks = 57;
+	int brightness = 0;
 	while(1) {
 		bgSetScroll(hudsonBg, x, x);
 		bgUpdate();
 		if(flipflop)x++;
+		if (kicks <= 0 && brightness < 16 && flipflop) brightness++; // fade out
 		x%=512; // lcm of 256 and 512 is 512, repeating pattern after scrolling 512 pixels
 		flipflop ^= 1;
 		frames++;
 		frames %= period * 2;
-		if (frames > period) bgHide(poweroffBg);
+		if (frames == period) kicks--;
+		if (frames > period && kicks > 0) bgHide(poweroffBg);
 		else bgShow(poweroffBg);
+		setBrightness(3, brightness);
 		swiWaitForVBlank();
 	}
 
