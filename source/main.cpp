@@ -69,9 +69,9 @@ int main(void)
 		if (kicks <= 0 && brightness < 16 && flipflop) brightness++; // fade out
 		x%=512; // lcm of 256 and 512 is 512, repeating pattern after scrolling 512 pixels
 		flipflop ^= 1;
+		if (frames == 0) kicks--;
 		frames++;
 		frames %= period * 2;
-		if (frames == period) kicks--;
 		if (frames > period && kicks > 0) bgHide(poweroffBg);
 		else bgShow(poweroffBg);
 		setBrightness(3, brightness);
