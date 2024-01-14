@@ -51,28 +51,48 @@ int main(void)
 
 	// Use this if you have the soundbank loaded into memory
     mmInitDefaultMem( (mm_addr)soundbank_bin );
+	// mmInitDefault( "soundbank.bin" );
 	// load sound effects
 	mmLoadEffect( SFX_NOPARTY );
+	mmLoadEffect( SFX_5BEAT );
 	// play sound effect
 	mmEffect(SFX_NOPARTY);
+
+	#define noparty_len 68197 * 60 / 1000 - 10
+	#define partyend_len 39 * 4 * 2
 
 	int x = 0;
 	int flipflop = 0; // flopflop slows scrolling by 2x
 	int frames = 0;
 	#define period 39
-	int kicks = 57;
 	int brightness = 0;
+	int songtime = 0;
+	int songrepeats = 3;
+	int partyend = 0;
 	while(1) {
+		songtime++;
+		if (songrepeats > 0) {
+			if (songtime == noparty_len) {
+				songrepeats--;
+				if (songrepeats > 0) mmEffect(SFX_NOPARTY);
+				else mmEffect(SFX_5BEAT);
+				songtime = 0;
+			}
+		} else {
+			if (songtime == partyend_len) {
+				partyend = 1;
+			}
+		}
 		bgSetScroll(hudsonBg, x, x);
 		bgUpdate();
 		if(flipflop)x++;
-		if (kicks <= 0 && brightness < 16 && flipflop) brightness++; // fade out
+		if (partyend && brightness < 16) brightness++; // fade out
 		x%=512; // lcm of 256 and 512 is 512, repeating pattern after scrolling 512 pixels
 		flipflop ^= 1;
-		if (frames == 0) kicks--;
+		// if (frames == 0) kicks--;
 		frames++;
 		frames %= period * 2;
-		if (frames > period && kicks > 0) bgHide(poweroffBg);
+		if (frames > period) bgHide(poweroffBg);
 		else bgShow(poweroffBg);
 		setBrightness(3, brightness);
 		swiWaitForVBlank();
