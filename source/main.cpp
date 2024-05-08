@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <gl2d.h>
 #include <maxmod9.h>
+// #include <filesystem.h>
+// #include <dirent.h>
 
 #include "soundbank.h"  // Soundbank definitions
 #include "soundbank_bin.h"  // Soundbank binary file
@@ -51,6 +53,7 @@ int main(void)
 
 	// Use this if you have the soundbank loaded into memory
     mmInitDefaultMem( (mm_addr)soundbank_bin );
+	// nitroFSInit(NULL);
 	// mmInitDefault( "soundbank.bin" );
 	// load sound effects
 	mmLoadEffect( SFX_NOPARTY );
@@ -62,7 +65,7 @@ int main(void)
 	#define partyend_len 39 * 4 * 2
 
 	int x = 0;
-	int flipflop = 0; // flopflop slows scrolling by 2x
+	int scroll_counter = 0; // scroll counter slows scrolling by 43
 	int frames = 0;
 	#define period 39
 	int brightness = 0;
@@ -85,10 +88,11 @@ int main(void)
 		}
 		bgSetScroll(hudsonBg, x, x);
 		bgUpdate();
-		if(flipflop)x++;
+		if (!scroll_counter) x++;
 		if (partyend && brightness < 16) brightness++; // fade out
 		x%=512; // lcm of 256 and 512 is 512, repeating pattern after scrolling 512 pixels
-		flipflop ^= 1;
+		scroll_counter += 1;
+		if (scroll_counter > 2) scroll_counter = 0;
 		// if (frames == 0) kicks--;
 		frames++;
 		frames %= period * 2;

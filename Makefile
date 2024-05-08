@@ -21,6 +21,13 @@ DATA		:=
 INCLUDES	:=	include
 GRAPHICS	:=	data gfx
 AUDIO       :=  audio
+NITRODATA	:=	nitrofiles
+
+GAME_ICON   :=  ../gfx/icon.bmp
+GAME_TITLE  :=  Mario Party DS
+GAME_SUBTITLE1 := Nintendo
+GAME_SUBTITLE2 :=
+
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -41,7 +48,7 @@ LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH)  -Wl,-Map,$(notdir $*.map)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:= -lmm9 -lnds9
+LIBS	:= -lfilesystem -lfat -lmm9 -lnds9 
  
  
 #---------------------------------------------------------------------------------
@@ -57,6 +64,8 @@ LIBDIRS	:=	$(LIBNDS)
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
  
+export TOPDIR	:=	$(CURDIR)
+
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
  
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
@@ -64,6 +73,10 @@ export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir))
 
 export DEPSDIR	:=	$(CURDIR)/$(BUILD)
+
+ifneq ($(strip $(NITRODATA)),)
+	export NITRO_FILES	:=	$(CURDIR)/$(NITRODATA)
+endif
 
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
@@ -125,6 +138,7 @@ DEPENDS	:=	$(OFILES:.o=.d)
 # main targets
 #---------------------------------------------------------------------------------
 $(OUTPUT).nds	: 	$(OUTPUT).elf
+$(OUTPUT).nds	: 	$(shell find $(TOPDIR)/$(NITRODATA))
 $(OUTPUT).elf	:	$(OFILES)
 
 $(OFILES_SOURCES) : $(HFILES)
